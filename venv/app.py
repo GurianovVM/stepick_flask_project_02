@@ -1,4 +1,11 @@
 from flask import Flask, render_template
+import json
+
+with open('./static/goals.json', 'r') as f:
+    goals = json.load(f)
+
+with open('./static/teachers.json', 'r') as f:
+    teachers = json.load(f)
 
 app = Flask(__name__)
 
@@ -12,7 +19,13 @@ def render_goal(goal):
 
 @app.route('/profiles/<id_teacher>/')
 def render_profiles(id_teacher):
-    return render_template('profile.html')
+    teacher = {}
+    for i in range(len(teachers)):
+        if int(id_teacher) == teachers[i]['id']:
+            teacher = teachers[i]
+
+    week = {'mon': 'Понедельник', 'tue': 'Вторник', 'wed': 'Среда', 'thu': 'Четверг', 'fri': 'Пятница', 'sat': 'Суббота', 'sun': 'Воскресенье'}
+    return render_template('profile.html', teacher=teacher, week=week, goals=goals)
 
 @app.route('/request/')
 def render_request():

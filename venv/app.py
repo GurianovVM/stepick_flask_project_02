@@ -29,27 +29,91 @@ def render_profiles(id_teacher):
 
 @app.route('/request/')
 def render_request():
+    form = """<form action="/request_done/" class="card mb-5" method="POST">
+        <div class="card-body text-center pt-5">
+          <h1 class="h3 card-title mt-4 mb-2">Подбор преподавателя</h1>
+          <p class="px-5">Напишите, чего вам нужно и&nbsp;мы&nbsp;подберем отличных&nbsp;ребят</p>
+        </div>
+        <hr>
+        <div class="card-body mx-3">
+          <div class="row">
+            <div class="col">
+              <p>Какая цель занятий?</p>
+              <div class="form-check ">
+                <input type="radio" class="form-check-input" name="goal" value="travel" id="goal1" checked>
+                <label class="form-check-label" for="goal1">
+                  Для путешествий
+                </label> 
+              </div>
+              <div class="form-check ">
+                <input type="radio" class="form-check-input" name="goal" value="learn" id="goal2">
+                <label class="form-check-label" for="goal2">
+                  Для школы
+                </label>
+              </div>
+              <div class="form-check ">
+                <input type="radio" class="form-check-input" name="goal" value="work" id="goal3">
+                <label class="form-check-label" for="goal2">
+                  Для работы
+                </label>
+              </div>
+              <div class="form-check ">
+                <input type="radio" class="form-check-input" name="goal" value="move" id="goal4">
+                <label class="form-check-label" for="goal2">
+                  Для переезда
+                </label>
+              </div>
+            </div>
+            <div class="col">
+              <p>Сколько времени есть?</p>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" name="time" value="1-2" id="time1">
+                <label class="form-check-label" for="time1">
+                  1-2 часа в&nbsp;неделю
+                </label> 
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" name="time" value="3-5" id="time2">
+                <label class="form-check-label" for="time2">
+                  3-5 часов в&nbsp;неделю
+                </label>
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" name="time" value="5-7" id="time3" checked>
+                <label class="form-check-label" for="time3">
+                  5-7 часов в&nbsp;неделю
+                </label> 
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" name="time" value="7-10" id="time4">
+                <label class="form-check-label" for="time4">
+                  7-10 часов в&nbsp;неделю
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="card-body mx-3">
+          <label class="mb-1 mt-2">Вас зовут</label>
+          <input class="form-control" type="text" placeholder="ФИО" name = "request_name">
+          <label class="mb-1 mt-2">Ваш телефон</label>
+          <input class="form-control" type="text" placeholder="+7. . ." name = "request_phone">
+          <input type="submit" class="btn btn-primary mt-4 mb-2" value="Найдите мне преподавателя">
+        </div>
+      </form>"""
     return render_template('request.html')
 
-@app.route('/request_done/')
+@app.route('/request_done/', methods=['POST'])
 def render_request_done():
-    return render_template('request_done.html')
-
-@app.route('/booking_done/', methods=['POST'])
-def form_booking():
-    booking = {'client_day': request.form.get('clientWeekday'),
-                'client_time': request.form.get('clientTime'),
-                'teacher_id': request.form.get('clientTeacher'),
-                'client_name': request.form.get('clientName'),
-                'client_phone': request.form.get('clientPhone')}
-    with open('booking.jsonlines', 'a', encoding='utf-8') as f:
-        json.dump(booking, f)
+    requests = {'client_goal': request.form.get('goal'),
+                'client_time': request.form.get('time'),
+                'client_name': request.form.get('request_name'),
+                'client_phone': request.form.get('request_phone')}
+    with open('request.jsonlines', 'a', encoding='utf-8') as f:
+        json.dump(requests, f, ensure_ascii=False)
         f.write('\n')
-    client_week_day = ''
-    for i in week:
-        if booking['client_day'] == i:
-            client_week_day = week[i]
-    return render_template('booking_done.html', name=booking['client_name'], day=client_week_day, hour=booking['client_time'], phone=booking['client_phone'])
+    return render_template('request_done.html')
 
 @app.route('/booking/<id_teacher>/<day>/<time>/')
 def render_booking(id_teacher, day, time):
@@ -84,9 +148,21 @@ def render_booking(id_teacher, day, time):
         </form>"""
     return render_template('booking.html', teacher=teacher, day=day, hour=time, week=week)
 
-@app.route('/booking_done/')
-def render_booking_done():
-    return render_template('booking_done.html')
+@app.route('/booking_done/', methods=['POST'])
+def form_booking():
+    booking = {'client_day': request.form.get('clientWeekday'),
+                'client_time': request.form.get('clientTime'),
+                'teacher_id': request.form.get('clientTeacher'),
+                'client_name': request.form.get('clientName'),
+                'client_phone': request.form.get('clientPhone')}
+    with open('booking.jsonlines', 'a', encoding='utf-8') as f:
+        json.dump(booking, f)
+        f.write('\n')
+    client_week_day = ''
+    for i in week:
+        if booking['client_day'] == i:
+            client_week_day = week[i]
+    return render_template('booking_done.html', name=booking['client_name'], day=client_week_day, hour=booking['client_time'], phone=booking['client_phone'])
 
 if __name__ == '__main__':
     app.run(debug=True)

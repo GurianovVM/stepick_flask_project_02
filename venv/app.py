@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import json
+import json, random
 
 with open('./static/goals.json', 'r') as f:
     goals = json.load(f)
@@ -13,11 +13,26 @@ app = Flask(__name__)
 
 @app.route('/')
 def render_main():
-    return render_template('index.html')
+    temp_list = sorted(random.sample(range(1, 11), 6))
+
+    teacher = []
+    for i in temp_list:
+        teacher.append(teachers[i])
+    return render_template('index.html', goals=goals, teacher=teacher)
 
 @app.route('/goals/<goal>/')
 def render_goal(goal):
-    return render_template('goal.html')
+    goal_teacher = []
+    for teacher in teachers:
+        temp_list = teacher['goals']
+        for i in temp_list:
+            if i == goal:
+                goal_teacher.append(teacher)
+
+    for i in goals:
+        if i == goal:
+            goal = goals[i]
+    return render_template('goal.html', goal=goal, teachers=goal_teacher)
 
 @app.route('/profiles/<id_teacher>/')
 def render_profiles(id_teacher):

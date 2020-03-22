@@ -179,5 +179,9 @@ def form_booking():
             client_week_day = week[i]
     return render_template('booking_done.html', name=booking['client_name'], day=client_week_day, hour=booking['client_time'], phone=booking['client_phone'])
 
+@app.route('/all/')
+def render_all_profiles():
+    return render_template('all_profile.html', teachers=teachers)
+
 if __name__ == '__main__':
     app.run(debug=True)

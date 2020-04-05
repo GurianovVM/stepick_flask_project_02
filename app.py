@@ -14,11 +14,17 @@ app = Flask(__name__)
 @app.route('/')
 def render_main():
     temp_list = sorted(random.sample(range(1, 11), 6))
-
     teacher = []
     for i in temp_list:
         teacher.append(teachers[i])
-    return render_template('index.html', goals=goals, teacher=teacher)
+    temp_goal = {}
+    for i in goals:
+        temp_goal[i] = goals[i]
+    temp_goal['travel'] = '⛱' + goals['travel']
+    temp_goal['study'] = '🏫 ' + goals['study']
+    temp_goal['work'] = '🏢 ' + goals['work']
+    temp_goal['relocate'] = '🚜 ' + goals['relocate']
+    return render_template('index.html', goals=temp_goal, teacher=teacher)
 
 @app.route('/goals/<goal>/')
 def render_goal(goal):
